@@ -1,60 +1,111 @@
-#include <iostream>
-#include <queue>
-#include <vector>
-
+#include<iostream>
 using namespace std;
-
-vector<int> edges[101];
-bool visited[101];
-queue<pair<int, int>> q; // bfs에서 사용할 큐 (idx, depth)
-int len, src, dst;
-
-void initialize() {
-   for (int i = 0; i < 101; i++) {
-      visited[i] = false;
-      edges[i] = vector<int>(0);
-   }
+int arr[301][301];
+int queue[990000];
+int front,rear;
+bool visit[301];
+int N,start;
+int x,y;
+int answer[101];
+int cnt;
+int start2;
+int cnt2;
+int T;
+int ANSWER;
+//끝난걸 어떻게 알까...? 원타임사용해서 cnt값이랑 같으면 마지막 구간이라고 생각하면댐
+void onetime(){
+    cnt2=cnt;
+    front=0;
+    rear=0;
+    for(int i=1;i<=300;i++){
+        queue[i]=0;
+        visit[i]=false;
+    }
+    visit[start2]=true;
+    for(int i=1;i<=100;i++){
+        if(arr[start2][i]==1){
+            rear++;
+            queue[rear]=i;
+        }
+    }
 }
-
-void inputs() {
-   cin >> len >> src;
-   q.push(make_pair(src, 0));
-   for (int i = 0; i < len; i += 2) {
-      cin >> src >> dst;
-      edges[src].push_back(dst);
-   }
+void reset(){
+    ANSWER=0;
+    front=0;
+    rear=0;
+    cnt=0;
+    cnt2=0;
+    T=0;
+    for(int i=1;i<=300;i++){
+        answer[i]=0;
+        queue[i]=0;
+        visit[i]=false;
+    }
+    for(int i=1;i<=300;i++){
+        for(int j=1;j<=300;j++){
+            arr[i][j]=0;
+        }
+    }
 }
-
-int bfs() {
-   int max_dep = 0;
-   int max_val = 0;
-
-   while (!q.empty()) {
-      int cur = q.front().first;
-      int dep = q.front().second;
-      q.pop();
-      if (max_dep < dep || (max_dep == dep && max_val < cur)) {
-         max_dep = dep;
-         max_val = cur;
-      }
-      if (!visited[cur]) {
-         visited[cur] = true;
-         for (int next : edges[cur]) {
-            if (!visited[next]) {
-               q.push(make_pair(next, dep + 1));
+void input(){
+    cin>>N>>start;
+    for(int i=1;i<=N/2;i++){
+        cin>>x>>y;
+        arr[x][y]=1;
+    }
+    start2=start;
+    visit[start]=true;
+    for(int i=1;i<=100;i++){
+        if(arr[start][i]==1){
+            rear++;
+            queue[rear]=i;
+        }
+    }
+}
+void bfs(){
+    int count=1;
+    while(front!=rear){
+        cnt++;
+        front++;
+        cout<<rear<<' '<<front<<endl;
+        if(rear==cnt2){
+            answer[count]=queue[front];
+            count++;
+            T=count;
+        }
+        int cur=queue[front];
+        if(!visit[cur]){
+            visit[cur]=true;
+            //cout<<cur<<' ';
+            for(int i=1;i<=100;i++){
+                if(arr[cur][i]==1){
+                    if(!visit[i]){
+                        rear++;
+                        queue[rear]=i;
+                    }
+                }
             }
-         }
-      }
-   }
-   return max_val;
+        }
+    }
 }
-
-int main(void) {
-   for (int test_case = 1; test_case <= 10; ++test_case){
-      initialize();
-      inputs();
-      cout << '#' << test_case << ' ' << bfs() << '\n';
-   }
-
-   return 0;
+int main(){
+    //freopen("input.txt", "r", stdin);
+    int test=10;
+    int num=0;
+    while(test--){
+        reset();
+        num+=1;
+        input();
+        bfs();
+        onetime();
+        bfs();
+        for(int i=1;i<T;i++){
+            cout<<answer[i]<<' ';
+            if(ANSWER<answer[i]){
+                ANSWER=answer[i];
+            }
+        }
+        cout<<"#"<<num<<' '<<ANSWER<<endl;
+    }
+    return 0;
 }
